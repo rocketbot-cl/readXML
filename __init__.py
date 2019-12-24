@@ -1,0 +1,123 @@
+# coding: utf-8
+"""
+Base para desarrollo de modulos externos.
+Para obtener el modulo/Funcion que se esta llamando:
+     GetParams("module")
+
+Para obtener las variables enviadas desde formulario/comando Rocketbot:
+    var = GetParams(variable)
+    Las "variable" se define en forms del archivo package.json
+
+Para modificar la variable de Rocketbot:
+    SetVar(Variable_Rocketbot, "dato")
+
+Para obtener una variable de Rocketbot:
+    var = GetVar(Variable_Rocketbot)
+
+Para obtener la Opcion seleccionada:
+    opcion = GetParams("option")
+
+
+Para instalar librerias se debe ingresar por terminal a la carpeta "libs"
+    
+    pip install <package> -t .
+
+"""
+from bs4 import BeautifulSoup
+import os
+
+
+def GetText(nodo):
+    try:
+        return nodo.text
+    except:
+        return ""
+
+
+"""
+    Obtengo el modulo que fue invocado
+"""
+module = GetParams("module")
+
+"""
+    Obtengo variables
+"""
+if module == "getDataXML":
+
+    path = GetParams('path')
+    var_ = GetParams('result')
+    print(var_)
+
+    try:
+        xml = open(path, "r").read()
+        bs = BeautifulSoup(xml, "lxml")
+        # print(bs)
+    except:
+        PrintException()
+
+    try:
+
+        """DATOS FACTURA"""
+
+        tipoDTE = GetText(bs.tipodte)
+        folio = GetText(bs.folio)
+        fchEmision = GetText(bs.fchemis)
+
+        """DATOS EMISOR"""
+
+        RutEmisor = GetText(bs.emisor.rutemisor)
+        RznSocEmisor = GetText(bs.emisor.rznsoc)
+        GiroEmisor = GetText(bs.emisor.giroemis)
+        ActecoEmisor = GetText(bs.emisor.acteco)
+        DirEmisor = GetText(bs.emisor.dirorigen)
+        CmnaEmisor = GetText(bs.emisor.cmnaorigen)
+        CiudadEmisor = GetText(bs.emisor.ciudadorigen)
+
+        """DATOS RECEPTOR"""
+
+        RutReceptor = GetText(bs.receptor.rutrecep)
+        RznSocReceptor = GetText(bs.receptor.rznsocrecep)
+        GiroReceptor = GetText(bs.receptor.girorecep)
+        ContactoReceptor = GetText(bs.receptor.contacto)
+        DirReceptor = GetText(bs.receptor.dirrecep)
+        CmnaReceptor = GetText(bs.receptor.cmnarecep)
+        CiudadReceptor = GetText(bs.receptor.ciudadrecep)
+
+        """TOTALES"""
+
+        MontoNeto = GetText(bs.totales.mntneto)
+        MontoExe = GetText(bs.totales.mntexe)
+        TasaIva = GetText(bs.totales.tasaiva)
+        Iva = GetText(bs.totales.iva)
+        MontoTotal = GetText(bs.mnttotal)
+
+        """DETALLE"""
+
+        Itemdetalle = []
+        detalles = bs.find_all('detalle')
+
+        for detalle in detalles:
+            tmp = \
+                {
+                    "Producto": GetText(detalle.nmbitem),
+                    "Cantidad": GetText(detalle.qtyitem),
+                    "Precio": GetText(detalle.prcitem),
+                    "Monto": GetText(detalle.montoitem)
+                }
+            Itemdetalle.append(tmp)
+
+        datos = {'tipoDTE': tipoDTE, 'folio': folio, 'fchEmision': fchEmision, 'RutEmisor': RutEmisor,
+                 'RznSocEmisor': RznSocEmisor,
+                 'GiroEmisor': GiroEmisor, 'ActecoEmisor': ActecoEmisor, 'DirEmisor': DirEmisor,
+                 'CmnaEmisor': CmnaEmisor, 'CiudadEmisor': CiudadEmisor,
+                 'RutReceptor': RutReceptor, 'RznSocReceptor': RznSocReceptor, 'GiroReceptor': GiroReceptor,
+                 'ContactoReceptor': ContactoReceptor, 'DirReceptor': DirReceptor,
+                 'CmnaReceptor': CmnaReceptor, 'CiudadReceptor': CiudadReceptor, 'MontoNeto': MontoNeto,
+                 'MontoExe': MontoExe,
+                 'TasaIva': TasaIva, 'Iva': Iva, 'MontoTotal': MontoTotal, 'Detalles': Itemdetalle}
+        print(datos)
+
+        SetVar(var_, datos)
+
+    except:
+        PrintException()
