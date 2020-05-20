@@ -1,5 +1,5 @@
 # readXML
- Module to obtains tags from Chile's xml invoice, type 33
+ Module to obtains tags from Chile's xml invoice type 33 and Colombian invoice
 
 ![alt text](https://raw.githubusercontent.com/rocketbot-cl/readXML/master/example/xml.png)
 
