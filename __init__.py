@@ -26,6 +26,14 @@ Para instalar librerias se debe ingresar por terminal a la carpeta "libs"
 from bs4 import BeautifulSoup
 import os
 
+base_path = tmp_global_obj["basepath"]
+cur_path = base_path + 'modules' + os.sep + 'readXML' + os.sep + 'libs' + os.sep
+sys.path.append(cur_path)
+import xmltodict
+import json
+
+global to_dict
+global GetText
 
 def GetText(nodo):
     try:
@@ -126,7 +134,6 @@ if module == "ColFactura":
 
     path = GetParams('path')
     var_ = GetParams('result')
-    print(var_)
 
     try:
         with open(path, "r", encoding="utf8") as file:
@@ -135,6 +142,7 @@ if module == "ColFactura":
         # print(bs)
     except:
         PrintException()
+        raise e
 
 
     try:
@@ -145,8 +153,8 @@ if module == "ColFactura":
         # fchEmision = GetText(bs.fchemis)
 
         """DATOS EMISOR"""
-
-        invoice = bs.attachment.externalreference.description.invoice
+        print("holaaaa")
+        invoice = bs.attachment["cac:externalreference"]["cbc:description"]["invoice"]
 
         invoice_child = invoice.findChild("cac:accountingsupplierparty")
 
@@ -201,3 +209,20 @@ if module == "ColFactura":
     except Exception as e:
         PrintException()
         raise e
+
+if module == "xml2Dict":
+    path = GetParams('path')
+    var_ = GetParams('result')
+
+    with open(path, encoding='utf-8') as fd:
+        doc = xmltodict.parse(fd.read())
+
+    SetVar(var_, json.dumps(doc))
+
+
+if module == "xml_str2Dict":
+    xml = GetParams('xml')
+    var_ = GetParams('result')
+
+    doc = xmltodict.parse(xml)
+    SetVar(var_, json.dumps(doc))
