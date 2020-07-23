@@ -216,8 +216,7 @@ if module == "xml2Dict":
 
     with open(path, encoding='utf-8') as fd:
         doc = xmltodict.parse(fd.read())
-
-    SetVar(var_, json.dumps(doc))
+    SetVar(var_, json.loads(json.dumps(doc)))
 
 
 if module == "xml_str2Dict":
