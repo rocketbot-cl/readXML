@@ -214,14 +214,23 @@ if module == "xml2Dict":
     path = GetParams('path')
     var_ = GetParams('result')
 
-    with open(path, encoding='utf-8') as fd:
-        doc = xmltodict.parse(fd.read())
-    SetVar(var_, json.loads(json.dumps(doc)))
+    try:
+        with open(path, encoding='utf-8') as fd:
+            doc = xmltodict.parse(fd.read())
+            # doc = eval(str(json.dumps(doc)).replace("null", '""').replace("false", "False").replace("true", "True"))
+        SetVar(var_, json.loads(json.dumps(doc)))
+    except Exception as e:
+        PrintException()
+        raise e
 
 
 if module == "xml_str2Dict":
     xml = GetParams('xml')
-    var_ = GetParams('result')
+    result = GetParams('result')
 
-    doc = xmltodict.parse(xml)
-    SetVar(var_, json.dumps(doc))
+    try:
+        doc = xmltodict.parse(xml)
+        SetVar(result, json.dumps(doc))
+    except Exception as e:
+        PrintException()
+        raise e
