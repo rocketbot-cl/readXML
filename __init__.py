@@ -123,7 +123,7 @@ if module == "getDataXML":
                  'CmnaReceptor': CmnaReceptor, 'CiudadReceptor': CiudadReceptor, 'MontoNeto': MontoNeto,
                  'MontoExe': MontoExe,
                  'TasaIva': TasaIva, 'Iva': Iva, 'MontoTotal': MontoTotal, 'Detalles': Itemdetalle}
-        print(datos)
+        # print(datos)
 
         SetVar(var_, datos)
 
@@ -203,6 +203,106 @@ if module == "ColFactura":
         datos = {'razonSocial': RznSocEmisor,
                  'id': IDEmisor, 'contacto': ContactEmisor, 'direccion': DirEmisor,
                  'ciudad': CiudadEmisor, 'montoNeto': MontoNeto, 'montoTotal': MontoTotal, 'detalles': item_detail}
+
+        SetVar(var_, datos)
+
+    except Exception as e:
+        PrintException()
+        raise e
+
+
+if module == "EcuFactura":
+
+    path = GetParams('path')
+    var_ = GetParams('result')
+
+    try:
+        with open(path, "r", encoding="utf8") as file:
+            xml = file.read()
+        bs = BeautifulSoup(xml, "lxml")
+    except:
+        PrintException()
+        raise e
+
+
+    try:
+        """DATOS FACTURA"""
+
+        estado = GetText(bs.estado)
+        numero_autorizacion = GetText(bs.numeroautorizacion)
+        fecha_autorizacion = GetText(bs.fechaautorizacion)
+        ambiente = GetText(bs.ambiente)
+
+        """FACTURA"""
+
+        factura = bs.comprobante.factura
+
+        informacion_tributaria = {
+            "razon_social": GetText(factura.infotributaria.razonsocial),
+            "nombre_comercial":  GetText(factura.infotributaria.nombrecomercial),
+            "ruc":  GetText(factura.infotributaria.ruc),
+            "secuencial":  GetText(factura.infotributaria.secuencial),
+            "direccion":  GetText(factura.infotributaria.dirmatriz)
+
+        }
+
+        info_factura = {
+            "fecha_emision": GetText(factura.infofactura.fechaemision),
+            "direccion": GetText(factura.infofactura.direstablecimiento),
+            "razon_social": GetText(factura.infofactura.razonsocialcomprador),
+            "total_sin_impuestos": GetText(factura.infofactura.totalsinimpuestos),
+        }
+        total_con_impuestos = factura.infofactura.totalsinimpuestos.find_all('totalimpuesto')
+        total_impuesto = []
+        for impuesto in total_con_impuestos:
+            total_impuesto.append({
+                "base_imponible": GetText(impuesto.baseimponible),
+                "valor": GetText(impuesto.valor)
+            })
+
+        info_factura["total_con_impuestos"] = total_impuesto
+
+
+        """DETALLE"""
+
+        detalles = []
+
+        item_detail = factura.detalles.find_all('detalle')
+
+        for detalle in item_detail:
+            print(detalle, type(detalle), "\n*************")
+            tmp = {
+                "codigo_principal": GetText(detalle.codigoprincipal),
+                "codigo_auxiliar": GetText(detalle.codigoauxiliar),
+                "descripcion": GetText(detalle.descripcion),
+                "cantidad": GetText(detalle.cantidad),
+                "precio_unitario": GetText(detalle.preciounitario),
+                "descuento": GetText(detalle.descuento),
+                "precio_total_sin_impuesto": GetText(detalle.precio_total_sin_impuesto)
+            }
+
+            impuestos = []
+            for impuesto in detalle.impuestos.find_all('impuesto'):
+                impuestos.append({
+                    "tarifa": GetText(impuesto.tarifa),
+                    "base_imponible": GetText(impuesto.baseimponible),
+                    "valor": GetText(impuesto.valor)
+                })
+            tmp["impuestos"] = impuestos
+            detalles.append(tmp)
+
+
+
+
+        datos = {
+            "estado": estado,
+            "numero_autorizacion": numero_autorizacion,
+            "fecha_autorizacion": fecha_autorizacion,
+            "ambiente": ambiente,
+            "informacion_tributaria": informacion_tributaria,
+            "info_factura": info_factura,
+            "detalles": detalles,
+        }
 
         SetVar(var_, datos)
 
