@@ -1,9 +1,23 @@
 # readXML
- Module to obtains tags from Chile's xml invoice type 33 and Colombian invoice
+ Module to obtains tags from xml invoice  and convert xml to python dict
+ 
+ ## Commands
+
+<ul>
+<li>Invoice (33)</li>
+<li>Invoice (Colombia)</li>
+<li>Invoice (Ecuador)</li>
+<li>XML file to Dict</li>
+<li>XML to Dict</li>
+</ul>
 
 ![alt text](https://raw.githubusercontent.com/rocketbot-cl/readXML/master/example/xml.png)
 
 ![alt text](https://raw.githubusercontent.com/rocketbot-cl/readXML/master/example/xml2.png)
+
+## Updates
+### 4-Sep-2020
+- Invoice (Ecuador): Get data from Ecuador's invoice
 
 <h2>Dependencies</h2>
 
