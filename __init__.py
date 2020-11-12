@@ -317,9 +317,12 @@ if module == "EcuFactura":
 if module == "xml2Dict":
     path = GetParams('path')
     var_ = GetParams('result')
+    encoding = GetParams('encoding')
 
     try:
-        with open(path, encoding='utf-8') as fd:
+        if not encoding:
+            encoding = "latin-1"
+        with open(path, encoding=encoding) as fd:
             doc = xmltodict.parse(fd.read())
             # doc = eval(str(json.dumps(doc)).replace("null", '""').replace("false", "False").replace("true", "True"))
         SetVar(var_, json.loads(json.dumps(doc)))
